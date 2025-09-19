@@ -314,6 +314,18 @@ public class TebogoTefo {
     }
 }`;
 
+        // Check if user prefers reduced motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Skip animation on mobile devices or if user prefers reduced motion
+        const isMobile = window.innerWidth <= 480;
+
+        if (prefersReducedMotion || isMobile) {
+            codeElement.textContent = code;
+            codeElement.classList.remove('typing-animation');
+            return;
+        }
+
         let i = 0;
         codeElement.textContent = '';
 
