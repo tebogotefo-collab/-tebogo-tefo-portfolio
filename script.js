@@ -293,54 +293,91 @@ function initializeScrollEffects() {
 
 // Typing animation
 function initializeTypingAnimation() {
-    const codeElement = document.querySelector('.typing-animation');
+    const codeDisplay = document.getElementById('code-display');
+    const cursor = document.getElementById('typing-cursor');
 
-    if (codeElement) {
-        const code = `@Component
-@Service
-public class TebogoTefo {
+    if (!codeDisplay || !cursor) return;
 
-    private final int experienceYears = 20;
-    private final String expertise = "Java Enterprise";
-    private final List<String> technologies = Arrays.asList(
-        "Spring Boot", "Microservices",
-        "AWS", "Docker", "Kubernetes"
-    );
+    const codeLines = [
+        '@Component',
+        '@Service',
+        'public class TebogoTefo {',
+        '',
+        '\u00A0\u00A0\u00A0\u00A0private final int experienceYears = 20;',
+        '\u00A0\u00A0\u00A0\u00A0private final String expertise = "Java Enterprise";',
+        '\u00A0\u00A0\u00A0\u00A0private final List<String> technologies = Arrays.asList(',
+        '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0"Spring Boot", "Microservices",',
+        '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0"AWS", "Docker", "Kubernetes"',
+        '\u00A0\u00A0\u00A0\u00A0);',
+        '',
+        '\u00A0\u00A0\u00A0\u00A0@Autowired',
+        '\u00A0\u00A0\u00A0\u00A0private PassionForCoding passion;',
+        '',
+        '\u00A0\u00A0\u00A0\u00A0public String deliverResults() {',
+        '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0return "Enterprise-grade solutions";',
+        '\u00A0\u00A0\u00A0\u00A0}',
+        '}'
+    ];
 
-    @Autowired
-    private PassionForCoding passion;
+    // Clear existing static code lines (except cursor)
+    const existingLines = codeDisplay.querySelectorAll('.code-line');
+    existingLines.forEach(line => line.remove());
 
-    public String deliverResults() {
-        return "Enterprise-grade solutions";
+    // Check if user prefers reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.innerWidth <= 480;
+
+    if (prefersReducedMotion || isMobile) {
+        // Show all lines immediately without animation
+        codeLines.forEach(line => {
+            const lineElement = document.createElement('div');
+            lineElement.className = 'code-line';
+            lineElement.textContent = line;
+            codeDisplay.insertBefore(lineElement, cursor);
+        });
+        return;
     }
-}`;
 
-        // Check if user prefers reduced motion
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let currentLineIndex = 0;
+    let currentCharIndex = 0;
+    let currentLineElement = null;
 
-        // Skip animation on mobile devices or if user prefers reduced motion
-        const isMobile = window.innerWidth <= 480;
-
-        if (prefersReducedMotion || isMobile) {
-            codeElement.textContent = code;
-            codeElement.classList.remove('typing-animation');
+    function typeLine() {
+        if (currentLineIndex >= codeLines.length) {
+            // Animation complete
             return;
         }
 
-        let i = 0;
-        codeElement.textContent = '';
+        const currentLine = codeLines[currentLineIndex];
 
-        function typeWriter() {
-            if (i < code.length) {
-                codeElement.textContent += code.charAt(i);
-                i++;
-                setTimeout(typeWriter, 30);
-            }
+        // Create new line element if starting a new line
+        if (currentCharIndex === 0) {
+            currentLineElement = document.createElement('div');
+            currentLineElement.className = 'code-line';
+            codeDisplay.insertBefore(currentLineElement, cursor);
         }
 
-        // Start typing animation after a delay
-        setTimeout(typeWriter, 1000);
+        // Add next character
+        if (currentCharIndex < currentLine.length) {
+            currentLineElement.textContent = currentLine.substring(0, currentCharIndex + 1);
+            currentCharIndex++;
+
+            // Random typing speed between 30-80ms for realistic effect
+            const delay = Math.random() * 50 + 30;
+            setTimeout(typeLine, delay);
+        } else {
+            // Line complete, move to next line
+            currentLineIndex++;
+            currentCharIndex = 0;
+
+            // Pause between lines (200-400ms)
+            const lineDelay = Math.random() * 200 + 200;
+            setTimeout(typeLine, lineDelay);
+        }
     }
+
+    // Start typing animation after a delay
+    setTimeout(typeLine, 1000);
 }
 
 // Utility functions
