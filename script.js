@@ -183,8 +183,18 @@ function initializeTimeline() {
     }
 }
 
+// Initialize EmailJS
+function initializeEmailJS() {
+    // Initialize EmailJS with your public key
+    // You'll need to replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
+    emailjs.init('_sUG4_FJB9jLN2qGh');
+}
+
 // Contact form functionality
 function initializeContactForm() {
+    // Initialize EmailJS
+    initializeEmailJS();
+
     const contactForm = document.getElementById('contact-form');
 
     if (contactForm) {
@@ -204,59 +214,50 @@ function initializeContactForm() {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
             submitBtn.disabled = true;
 
-            // Prepare email content
-            const emailBody = `
-                <h2>New Portfolio Contact</h2>
-                <p><strong>Name:</strong> ${formObject.name}</p>
-                <p><strong>Email:</strong> ${formObject.email}</p>
-                <p><strong>Company:</strong> ${formObject.company || 'Not specified'}</p>
-                <p><strong>Message:</strong></p>
-                <p>${formObject.message.replace(/\n/g, '<br>')}</p>
-                <hr>
-                <p><small>Sent from portfolio website: ${window.location.href}</small></p>
-            `;
+            // Prepare template parameters for EmailJS
+            const templateParams = {
+                from_name: formObject.name,
+                from_email: formObject.email,
+                company: formObject.company || 'Not specified',
+                message: formObject.message,
+                to_email: 'tebogo.tefo@mathotech.dev',
+                website_url: window.location.href
+            };
 
-            // Send email using SMTP.js
-            Email.send({
-                SecureToken: "your-secure-token-here", // You'll need to configure this
-                To: 'tebogo.tefo@mathotech.dev',
-                From: 'noreply@your-domain.com', // Configure with your domain
-                Subject: `Portfolio Contact from ${formObject.name}`,
-                Body: emailBody
-            }).then(function(message) {
-                // Reset button
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
+            // Send email using EmailJS
+            emailjs.send('service_1ylhpkn', 'template_portfolio', templateParams)
+                .then(function(response) {
+                    console.log('Email sent successfully:', response);
 
-                if (message === 'OK') {
+                    // Reset button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+
                     // Reset form
                     contactForm.reset();
+
                     // Show success message
                     showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
-                } else {
+                })
+                .catch(function(error) {
+                    console.error('Email sending failed:', error);
+
+                    // Reset button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+
+                    // Show error message
+                    showNotification('Email sending failed. Using fallback method.', 'info');
+
                     // Fallback to mailto
                     const subject = `Portfolio Contact from ${formObject.name}`;
                     const body = `Name: ${formObject.name}\nEmail: ${formObject.email}\nCompany: ${formObject.company || 'Not specified'}\n\nMessage:\n${formObject.message}`;
                     const mailtoLink = `mailto:tebogo.tefo@mathotech.dev?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-                    window.location.href = mailtoLink;
-                    showNotification('Email client opened. Please send the message manually.', 'info');
-                }
-            }).catch(function(error) {
-                console.error('Email sending failed:', error);
-
-                // Reset button
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-
-                // Fallback to mailto
-                const subject = `Portfolio Contact from ${formObject.name}`;
-                const body = `Name: ${formObject.name}\nEmail: ${formObject.email}\nCompany: ${formObject.company || 'Not specified'}\n\nMessage:\n${formObject.message}`;
-                const mailtoLink = `mailto:tebogo.tefo@mathotech.dev?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-                window.location.href = mailtoLink;
-                showNotification('Using fallback email method. Please send the message manually.', 'info');
-            });
+                    setTimeout(() => {
+                        window.location.href = mailtoLink;
+                    }, 1000);
+                });
         });
     }
 }
