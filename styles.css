@@ -395,6 +395,10 @@ body {
     font-family: var(--font-mono);
     font-size: 0.875rem;
     line-height: 1.6;
+    text-align: left;
+    min-height: 380px;
+    height: 380px;
+    overflow: hidden;
 }
 
 .code-content pre {
@@ -457,6 +461,7 @@ body {
     font-family: var(--font-mono);
     color: #e5e7eb;
     position: relative;
+    text-align: left !important;
 }
 
 .code-line {
@@ -468,6 +473,7 @@ body {
     white-space: pre;
     font-family: var(--font-mono);
     tab-size: 4;
+    text-align: left !important;
 }
 
 .cursor-blink {
@@ -1229,6 +1235,11 @@ section {
     .code-content {
         padding: 1rem;
         font-size: 0.75rem;
+        height: 350px;
+        min-height: 350px;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .hero-title {
@@ -1300,7 +1311,7 @@ section {
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 430px) {
     .hero {
         padding-top: 4rem;
     }
@@ -1323,6 +1334,11 @@ section {
         padding: 0.75rem;
         font-size: 0.7rem;
         line-height: 1.4;
+        height: 290px;
+        min-height: 290px;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .window-header {

@@ -325,9 +325,9 @@ function initializeTypingAnimation() {
 
     // Check if user prefers reduced motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.innerWidth <= 480;
+    const isMobile = window.innerWidth <= 430;
 
-    if (prefersReducedMotion || isMobile) {
+    if (prefersReducedMotion) {
         // Show all lines immediately without animation
         codeLines.forEach(line => {
             const lineElement = document.createElement('div');
